@@ -273,7 +273,7 @@ export default function HomePage() {
             Terms
           </a>
           <a
-            href={https://forms.gle/78g5g7osQefrBqp26}
+            href={FEEDBACK_URL}
             target="_blank"
             rel="noopener"
             className="feedback-link"
