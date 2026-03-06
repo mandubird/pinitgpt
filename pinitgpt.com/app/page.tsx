@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 
 const CWS_URL =
   process.env.NEXT_PUBLIC_CWS_URL ||
