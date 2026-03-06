@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: system-ui, sans-serif; width: 320px; padding: 16px; margin: 0; background: #111; color: #eee; }
+    h1 { font-size: 18px; margin: 0 0 12px 0; display: flex; align-items: center; gap: 6px; }
+    .sub { font-size: 12px; color: #888; margin-bottom: 16px; }
+    .pro-badge { font-size: 11px; background: linear-gradient(90deg, #00e5ff, #00b8d4); color: #000; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+    .free-badge { font-size: 11px; color: #888; }
+    input { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 8px; border: 1px solid #333; background: #222; color: #fff; margin-bottom: 8px; outline: none; }
+    button { width: 100%; padding: 10px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+    .btn-activate { background: #00e5ff; color: #000; margin-bottom: 6px; }
+    .btn-activate:hover { background: #00b8d4; }
+    .btn-remove { background: transparent; color: #666; border: 1px solid #444; font-size: 11px; }
+    .msg { font-size: 11px; margin-top: 8px; min-height: 14px; line-height: 1.5; }
+    .msg.success { color: #00e5ff; }
+    .msg.error { color: #ff5252; }
+    .early { font-size: 10px; color: #00e5ff; margin-top: 12px; padding-top: 12px; border-top: 1px solid #222; }
+  </style>
+</head>
+<body>
+  <h1 data-i18n="popup_title">📌 pinitgpt</h1>
+  <p class="sub" data-i18n="popup_sub">ChatGPT 대화 핀 — 프로젝트 단위로 관리</p>
+  <div id="free-status" style="margin-bottom:14px;">
+    <span id="free-badge" class="free-badge" data-i18n="popup_free_badge">무료 사용 중</span>
+  </div>
+  <div id="early-section" style="display:none; margin-bottom:14px; padding:12px; background:#1a1a2e; border:1px solid #333; border-radius:8px;">
+    <div style="font-size:14px; font-weight:bold; color:#00e5ff; margin-bottom:8px;" data-i18n="popup_early_title">🌱 Early Supporter</div>
+    <p style="font-size:11px; line-height:1.5; color:#ddd; margin:0 0 10px 0;" data-i18n-html="popup_early_desc">당신은 pinitgpt의 초기 사용자입니다.<br>모든 Pro 기능을 제한 없이 사용할 수 있습니다.</p>
+    <div style="font-size:11px; color:#00e5ff;">
+      <div data-i18n="popup_early_ok1">✔ Pro 기능 활성화됨</div>
+      <div data-i18n="popup_early_ok2">✔ 추가 결제 없음</div>
+    </div>
+    <a href="https://app.gumroad.com/library" target="_blank" rel="noopener" style="display:block; margin-bottom:8px; font-size:10px; color:#888; text-align:center; text-decoration:underline;" data-i18n="popup_find_license_key">라이센스 키 확인 (Gumroad)</a>
+    <button id="btn-remove" class="btn-remove" style="display:block; width:100%; margin-top:12px;" data-i18n="popup_btn_remove">Pro 해제</button>
+  </div>
+  <div id="license-form" style="margin-top:14px;">
+    <input type="text" id="license-in" data-i18n-placeholder="popup_license_placeholder" placeholder="Gumroad 라이센스 키 입력" autocomplete="off">
+    <button id="btn-activate" class="btn-activate" data-i18n="popup_btn_activate">활성화</button>
+  </div>
+  <div id="popup-msg" class="msg"></div>
+  <p class="early" data-i18n="popup_footer">지금 사면 평생 Pro. 나중엔 구독 모델로 전환됩니다.</p>
+  <a id="popup-buy-link" href="https://remoney.gumroad.com/l/pinitgpt" target="_blank" rel="noopener" style="display:block; margin-top:10px; padding:10px; text-align:center; background:#1a1a2e; border:1px solid #333; border-radius:8px; color:#00e5ff; text-decoration:none; font-size:12px; font-weight:bold;" data-i18n="popup_buy_link">🔓 Early Supporter 구매 ($4.99)</a>
+  <script src="popup.js"></script>
+</body>
+</html>
