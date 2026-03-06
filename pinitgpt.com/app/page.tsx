@@ -55,7 +55,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main className="page">
+    <div role="main" className="page">
       <div className="container">
         <section className="hero">
           <div className="hero-grid">
@@ -283,7 +283,7 @@ export default function HomePage() {
           </a>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
