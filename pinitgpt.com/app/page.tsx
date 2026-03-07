@@ -7,6 +7,8 @@ const CWS_URL =
   "https://chromewebstore.google.com/detail/pinitgpt/pkohflhmjcffmgddalejheoeibaopibo";
 
 const FEEDBACK_URL = "https://forms.gle/DD5FCpq11asY4rqa9";
+const GUMROAD_URL =
+  process.env.NEXT_PUBLIC_GUMROAD_URL || "https://remoney.gumroad.com/l/pinitgpt";
 
 function trackEvent(name: string, params?: Record<string, any>) {
   if (typeof window === "undefined") return;
@@ -55,6 +57,10 @@ export default function HomePage() {
 
   const handleFeedbackClick = useCallback(() => {
     trackEvent("feedback_click", { source: "landing_footer" });
+  }, []);
+
+  const handleGumroadClick = useCallback(() => {
+    trackEvent("click_gumroad", { source: "landing_footer", destination: "gumroad_checkout" });
   }, []);
 
   return (
@@ -262,10 +268,21 @@ export default function HomePage() {
               Pin your next 10 high-signal conversations and see what sticks.
             </div>
           </div>
-          <button type="button" className="btn-primary" onClick={handleFooterInstallClick}>
-            <span>Install Free</span>
-            <span>→</span>
-          </button>
+          <div className="cta-row" style={{ marginTop: 0 }}>
+            <button type="button" className="btn-primary" onClick={handleFooterInstallClick}>
+              <span>Install Free</span>
+              <span>→</span>
+            </button>
+            <a
+              href={GUMROAD_URL}
+              target="_blank"
+              rel="noopener"
+              className="btn-secondary"
+              onClick={handleGumroadClick}
+            >
+              Buy Pro ($4.99)
+            </a>
+          </div>
         </section>
 
         <div className="footer-links" style={{ marginTop: 10 }}>
