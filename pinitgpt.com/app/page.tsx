@@ -13,7 +13,10 @@ function trackEvent(name: string, params?: Record<string, any>) {
   const w = window as any;
   if (typeof w.gtag === "function") {
     w.gtag("event", name, params || {});
+    return;
   }
+  w.dataLayer = w.dataLayer || [];
+  w.dataLayer.push({ event: name, ...(params || {}) });
 }
 
 export default function HomePage() {
@@ -286,4 +289,3 @@ export default function HomePage() {
     </div>
   );
 }
-
