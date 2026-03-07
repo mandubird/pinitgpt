@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 
 function toNumber(v: string | null, fallback: number) {
   if (!v) return fallback;
@@ -11,11 +10,10 @@ function toNumber(v: string | null, fallback: number) {
 }
 
 export default function PurchaseSuccessPage() {
-  const params = useSearchParams();
-
   useEffect(() => {
     if (typeof window === "undefined") return;
     const w = window as any;
+    const params = new URLSearchParams(window.location.search);
     const transactionId =
       params.get("sale_id") ||
       params.get("order_id") ||
@@ -42,7 +40,7 @@ export default function PurchaseSuccessPage() {
     }
     w.dataLayer = w.dataLayer || [];
     w.dataLayer.push(payload);
-  }, [params]);
+  }, []);
 
   return (
     <main className="simple-page">
@@ -57,4 +55,3 @@ export default function PurchaseSuccessPage() {
     </main>
   );
 }
-
