@@ -7,8 +7,14 @@ const CWS_URL =
   "https://chromewebstore.google.com/detail/pinitgpt/pkohflhmjcffmgddalejheoeibaopibo";
 
 const FEEDBACK_URL = "https://forms.gle/DD5FCpq11asY4rqa9";
-const GUMROAD_URL =
-  process.env.NEXT_PUBLIC_GUMROAD_URL || "https://remoney.gumroad.com/l/pinitgpt";
+const GUMROAD_URL = "https://remoney.gumroad.com/l/pinitgpt";
+const pricingRows = [
+  { feature: "Pins", free: "Up to 10", pro: "Unlimited" },
+  { feature: "Projects", free: "1", pro: "Unlimited" },
+  { feature: "Pin search", free: "✗", pro: "✓", proOnly: true },
+  { feature: "Tag filter", free: "✗", pro: "✓", proOnly: true },
+  { feature: "Continue mode", free: "✗", pro: "✓", proOnly: true },
+];
 
 function trackEvent(name: string, params?: Record<string, any>) {
   if (typeof window === "undefined") return;
@@ -61,6 +67,13 @@ export default function HomePage() {
 
   const handleGumroadClick = useCallback(() => {
     trackEvent("click_gumroad", { source: "landing_footer", destination: "gumroad_checkout" });
+  }, []);
+
+  const handleBuyProClick = useCallback(() => {
+    trackEvent("click_pro", { source: "pricing_table" });
+    if (typeof window !== "undefined") {
+      window.open(GUMROAD_URL, "_blank");
+    }
   }, []);
 
   return (
@@ -239,7 +252,7 @@ export default function HomePage() {
           <div className="social-proof-grid">
             <div className="social-proof-item">
               <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 4 }}>Early usage</div>
-              <div>30+ early users</div>
+              <div>93 early users</div>
               <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 4 }}>
                 Tracking how people actually use it before going bigger.
               </div>
@@ -258,6 +271,29 @@ export default function HomePage() {
                 Your chats stay in ChatGPT. pinitgpt only pins what you choose.
               </div>
             </div>
+          </div>
+        </section>
+
+        <section className="section">
+          <h2 className="section-title">Free vs Pro</h2>
+          <div className="pricing-compare">
+            <div className="pricing-header">
+              <span>Feature</span>
+              <span>Free</span>
+              <span className="pro-col">Pro</span>
+            </div>
+            {pricingRows.map((row, i) => (
+              <div key={i} className="pricing-row">
+                <span>{row.feature}</span>
+                <span className={row.proOnly ? "disabled" : ""}>{row.free}</span>
+                <span className="pro-value">{row.pro}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: 14 }}>
+            <button type="button" className="btn-primary" onClick={handleBuyProClick}>
+              <span>Buy Pro ($4.99)</span>
+            </button>
           </div>
         </section>
 

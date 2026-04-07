@@ -35,6 +35,42 @@ const user = { isPro: false };
 const LICENSE_STORAGE_KEY = "pinitgpt_license";
 const LOCALE_STORAGE_KEY = "pinitgpt_locale";
 const GUMROAD_URL = "https://remoney.gumroad.com/l/pinitgpt";
+const UPGRADE_PROMPT_TS_KEY = "pinitgpt_upgrade_prompt_last_ts";
+const UPGRADE_PROMPT_COOLDOWN_MS = 10 * 60 * 1000; // 10분
+
+function nowTs() {
+  return Date.now ? Date.now() : new Date().getTime();
+}
+
+function shouldShowUpgradePrompt() {
+  try {
+    const raw = localStorage.getItem(UPGRADE_PROMPT_TS_KEY);
+    if (!raw) return true;
+    const last = parseInt(raw, 10) || 0;
+    return (nowTs() - last) >= UPGRADE_PROMPT_COOLDOWN_MS;
+  } catch (e) {
+    return true;
+  }
+}
+
+function markUpgradePromptShown() {
+  try {
+    localStorage.setItem(UPGRADE_PROMPT_TS_KEY, String(nowTs()));
+  } catch (e) {}
+}
+
+function trackUpgradeClick(source) {
+  try {
+    console.debug("pinitgpt click_upgrade", { source: source });
+  } catch (e) {}
+}
+
+function openGumroadFromExtension(source) {
+  trackUpgradeClick(source);
+  try {
+    window.open(GUMROAD_URL, "_blank", "noopener");
+  } catch (e) {}
+}
 
 // 블록 단위 Pin: 렌더 블록(p, li, h1~h4, pre, blockquote) 기준
 const BLOCK_TAG_SELECTOR = "p, li, h1, h2, h3, h4, pre, blockquote";
@@ -413,6 +449,10 @@ function createSidebar() {
             💬 <span>` + t("feedback_btn") + `</span>
           </a>
         </div>
+        <div id="pinitgpt-upgrade-banner" style="display:none; margin-top:10px; padding-top:10px; border-top:1px solid #1a1a1a;">
+          <div style="font-size:11px; color:#888; line-height:1.4; margin-bottom:8px;">` + t("upgrade_banner_text") + `</div>
+          <button id="pinitgpt-upgrade-banner-btn" style="width:100%; padding:8px; border-radius:999px; border:none; background:linear-gradient(135deg,#22c55e,#38bdf8); color:#020617; font-size:12px; font-weight:700; cursor:pointer;">` + t("upgrade_btn") + `</button>
+        </div>
     </div>
     <style>
       #pinitgpt-sidebar .view-btn { padding: 5px 9px; border-radius: 6px; border: 1px solid #333; background: #1a1a1a; color: #efefef; cursor: pointer; font-size: 11px; white-space: nowrap; }
@@ -437,6 +477,7 @@ function createSidebar() {
       #pinitgpt-sidebar .pinitgpt-search-highlight { background: rgba(255, 235, 59, 0.6); color: #000; padding: 0 1px; border-radius: 2px; }
       #pinitgpt-sidebar .pinitgpt-lang-opt:hover { background: #2a2a2a; color: #00e5ff; }
       #pinitgpt-sidebar #pinitgpt-feedback-btn:hover { color: #00e5ff; }
+      #pinitgpt-sidebar #pinitgpt-upgrade-banner-btn:hover { filter: brightness(1.03); }
     </style>
   `;
 
@@ -510,11 +551,29 @@ function createSidebar() {
   var clearAllPinsEl = sidebar.querySelector("#clear-all-pins");
   if (clearAllPinsEl) clearAllPinsEl.onclick = () => { savePins(getPins().filter(p=>(p.conversationId || p.chatId) !== CHAT_ID)); renderPins(); };
 
+  var upgradeBannerBtn = sidebar.querySelector("#pinitgpt-upgrade-banner-btn");
+  if (upgradeBannerBtn) {
+    upgradeBannerBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      openGumroadFromExtension("sidebar_banner");
+    });
+  }
+
   var exportToast = sidebar.querySelector("#pinitgpt-export-toast");
   function showExportLock() {
     if (!exportToast) return;
     exportToast.style.display = "block";
     exportToast.innerHTML = t("export_pro_continue").replace("%s", GUMROAD_URL);
+    // Track upgrade click from export lock entrypoint
+    try {
+      var a = exportToast.querySelector("a");
+      if (a) {
+        a.addEventListener("click", function() {
+          trackUpgradeClick("export_lock");
+        }, { once: true });
+      }
+    } catch (e) {}
     setTimeout(function() { exportToast.style.display = "none"; }, 5000);
   }
   function downloadFile(filename, content, mimeType) {
@@ -624,7 +683,116 @@ function createSidebar() {
     });
   }
 
-  function showProUpgradeToast(message, buttonLabel) {
+  function showUpgradeLimitModal() {
+    if (!shouldShowUpgradePrompt()) return;
+    markUpgradePromptShown();
+    const overlay = document.createElement("div");
+    Object.assign(overlay.style, {
+      position: "fixed",
+      top: "0",
+      left: "0",
+      width: "100vw",
+      height: "100vh",
+      background: "rgba(0,0,0,0.7)",
+      zIndex: "2147483647",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center"
+    });
+    const modal = document.createElement("div");
+    Object.assign(modal.style, {
+      width: "320px",
+      maxWidth: "90vw",
+      background: "#111827",
+      borderRadius: "16px",
+      border: "1px solid #374151",
+      padding: "20px 18px 16px",
+      color: "#e5e7eb",
+      fontSize: "13px",
+      boxShadow: "0 18px 45px rgba(0,0,0,0.7)"
+    });
+    modal.innerHTML = ''
+      + '<div style="font-size:15px;font-weight:700;margin-bottom:10px;">You&#39;ve reached the free limit</div>'
+      + '<div style="font-size:12px;color:#9ca3af;margin-bottom:10px;line-height:1.5;">'
+      + 'Free version allows up to 5 pins in 1 chat.<br>'
+      + 'Upgrade to Pro to unlock unlimited pins and stronger organization tools.'
+      + '</div>'
+      + '<ul style="font-size:12px;color:#d1d5db;margin:0 0 12px 18px;padding:0;">'
+      + '<li>Unlimited pins</li>'
+      + '<li>Global search</li>'
+      + '<li>Tag filtering</li>'
+      + '<li>Export pins (CSV / Markdown)</li>'
+      + '<li>Continue view mode</li>'
+      + '</ul>'
+      + '<div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">'
+      + '<button id="pinitgpt-upgrade-primary"'
+      + ' style="padding:9px 12px;border-radius:999px;border:none;background:linear-gradient(135deg,#22c55e,#38bdf8);color:#020617;font-weight:600;cursor:pointer;">'
+      + 'Upgrade to Pro'
+      + '</button>'
+      + '<button id="pinitgpt-upgrade-secondary"'
+      + ' style="padding:8px 12px;border-radius:999px;border:1px solid #374151;background:#020617;color:#9ca3af;font-size:12px;cursor:pointer;">'
+      + 'Continue with free version'
+      + '</button>'
+      + '</div>';
+    overlay.addEventListener("click", function(e) {
+      if (e.target === overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    });
+    modal.addEventListener("click", function(e) { e.stopPropagation(); });
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    var primaryBtn = modal.querySelector("#pinitgpt-upgrade-primary");
+    var secondaryBtn = modal.querySelector("#pinitgpt-upgrade-secondary");
+    if (primaryBtn) {
+      primaryBtn.addEventListener("click", function() {
+        openGumroadFromExtension("limit_modal");
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      });
+    }
+    if (secondaryBtn) {
+      secondaryBtn.addEventListener("click", function() {
+        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+      });
+    }
+  }
+
+  function ensureNeutralToast() {
+    var el = document.getElementById("pinitgpt-neutral-toast");
+    if (el) return el;
+    el = document.createElement("div");
+    el.id = "pinitgpt-neutral-toast";
+    Object.assign(el.style, {
+      position: "fixed",
+      left: "50%",
+      bottom: "24px",
+      transform: "translateX(-50%)",
+      background: "rgba(17,24,39,0.96)",
+      color: "#e5e7eb",
+      border: "1px solid rgba(148,163,184,0.25)",
+      borderRadius: "12px",
+      padding: "10px 12px",
+      fontSize: "12px",
+      lineHeight: "1.4",
+      zIndex: "2147483647",
+      display: "none",
+      maxWidth: "92vw",
+      boxShadow: "0 18px 45px rgba(0,0,0,0.7)"
+    });
+    document.body.appendChild(el);
+    return el;
+  }
+
+  function showNeutralToast(message) {
+    var el = ensureNeutralToast();
+    if (!el) return;
+    el.textContent = message || "";
+    el.style.display = "block";
+    setTimeout(function () { el.style.display = "none"; }, 2500);
+  }
+
+  function showProUpgradeToast(message, buttonLabel, source) {
+    if (!shouldShowUpgradePrompt()) return;
+    markUpgradePromptShown();
+    if (source) trackUpgradeClick(source);
     const toast = document.getElementById("pinitgpt-pro-toast");
     if (!toast) return;
     const rect = document.querySelector("#pinitgpt-view-row");
@@ -654,6 +822,14 @@ function createSidebar() {
   if (searchIn) {
     var searchDebounceTimer = null;
     searchIn.addEventListener("input", function() {
+      if (!isProUser() && (this.value || "").trim()) {
+        // Pro search is locked: keep behavior additive (show prompt), do not change pin logic.
+        this.value = "";
+        searchQuery = "";
+        updateSearchClearVisible();
+        showProUpgradeToast(t("pro_toast_message") + "<br>" + t("pro_toast_body"), t("upgrade_btn"), "search_lock");
+        return;
+      }
       searchQuery = this.value.trim();
       updateSearchClearVisible();
       if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
@@ -672,7 +848,7 @@ function createSidebar() {
       const view = btn.dataset.view;
       const isProOnly = view === "all" || view === "continue";
       if (isProOnly && !isProUser()) {
-        showProUpgradeToast(t("pro_toast_message") + "<br>" + t("pro_toast_body"), t("upgrade_btn"));
+        showProUpgradeToast(t("pro_toast_message") + "<br>" + t("pro_toast_body"), t("upgrade_btn"), view === "all" ? "view_all" : "view_continue");
         return;
       }
       filterMode = view;
@@ -859,6 +1035,9 @@ function showCategoryPopup(msgElement, text, blockInfo) {
 
           if (!isProUser()) {
             if (pinCount >= LIMITS.FREE.PINS_PER_PROJECT) {
+              if (shouldShowUpgradePrompt()) {
+                showUpgradeLimitModal();
+              }
               pinLimitToast.innerHTML = t("pin_limit_toast").replace("%s", String(LIMITS.FREE.PINS_PER_PROJECT)) + "<br><a href=\"" + GUMROAD_URL + "\" target=\"_blank\" rel=\"noopener\" style=\"color:#00e5ff; text-decoration:underline; font-weight:bold; margin-top:6px; display:inline-block;\">" + t("pin_limit_continue") + "</a>";
               return;
             }
@@ -901,11 +1080,16 @@ function showCategoryPopup(msgElement, text, blockInfo) {
             pinData.blockType = blockInfo.blockType || "paragraph";
             pinData.blockTextHead = blockInfo.blockTextHead || getBlockTextHead(text);
           }
+          var isFirstPinInChat = (pinCount === 0);
           p.push(pinData);
           savePins(p);
           filterMode = "current";
           currentFilter = (conf.type === "continue" ? "all" : conf.color);
           renderPins();
+          // First pin success moment: neutral toast only (no upgrade CTA)
+          if (isFirstPinInChat) {
+            showNeutralToast(t("pinned_success_toast").replace("{0}", String(LIMITS.FREE.PINS_PER_PROJECT)));
+          }
       };
   };
   modal.onclick = (e) => e.stopPropagation();
@@ -995,6 +1179,8 @@ function renderPins() {
   if (licenseSection) licenseSection.style.display = isProUser() ? "none" : "block";
   var licenseRemoveBtnEl = document.getElementById("pinitgpt-license-remove");
   if (licenseRemoveBtnEl) licenseRemoveBtnEl.style.display = isProUser() ? "block" : "none";
+  var upgradeBanner = document.getElementById("pinitgpt-upgrade-banner");
+  if (upgradeBanner) upgradeBanner.style.display = isProUser() ? "none" : "block";
 
   var planBadge = document.getElementById("pinitgpt-plan-badge");
   var usageGauge = document.getElementById("pinitgpt-usage-gauge");

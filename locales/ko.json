@@ -96,5 +96,7 @@
   "license_remove_btn": "Pro 해제",
   "popup_find_license_key": "라이센스 키 확인 (Gumroad 라이브러리)",
   "popup_revalidate_fail": "라이센스가 만료 또는 취소되었습니다. Pro가 해제되었습니다.",
-  "feedback_btn": "💬 개선 의견 보내기 (1분)"
+  "feedback_btn": "💬 개선 의견 보내기 (1분)",
+  "upgrade_banner_text": "무제한 핀과 강력한 검색을 잠금 해제하세요.",
+  "pinned_success_toast": "저장 완료! 무료는 핀 {0}개까지 저장할 수 있어요."
 }

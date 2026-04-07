@@ -96,5 +96,7 @@
   "license_remove_btn": "Deactivate Pro",
   "popup_find_license_key": "Find license key (Gumroad Library)",
   "popup_revalidate_fail": "License expired or revoked. Pro has been deactivated.",
-  "feedback_btn": "💬 Help improve (1 min)"
+  "feedback_btn": "💬 Help improve (1 min)",
+  "upgrade_banner_text": "Unlock unlimited pins and powerful search.",
+  "pinned_success_toast": "Pinned successfully. You can save up to {0} pins in free."
 }
