@@ -9,11 +9,11 @@ const CWS_URL =
 const FEEDBACK_URL = "https://forms.gle/DD5FCpq11asY4rqa9";
 const GUMROAD_URL = "https://remoney.gumroad.com/l/pinitgpt";
 const pricingRows = [
-  { feature: "Pins", free: "Up to 10", pro: "Unlimited" },
-  { feature: "Projects", free: "1", pro: "Unlimited" },
-  { feature: "Pin search", free: "✗", pro: "✓", proOnly: true },
-  { feature: "Tag filter", free: "✗", pro: "✓", proOnly: true },
-  { feature: "Continue mode", free: "✗", pro: "✓", proOnly: true },
+  { feature: "Pins", free: "5", pro: "Unlimited" },
+  { feature: "Chats", free: "1", pro: "Unlimited" },
+  { feature: "Global search", free: "✗", pro: "✓", proOnly: true },
+  { feature: "Tags & filter", free: "✗", pro: "✓", proOnly: true },
+  { feature: "Export (CSV)", free: "✗", pro: "✓", proOnly: true },
 ];
 
 function trackEvent(name: string, params?: Record<string, any>) {
@@ -66,14 +66,7 @@ export default function HomePage() {
   }, []);
 
   const handleGumroadClick = useCallback(() => {
-    trackEvent("click_gumroad", { source: "landing_footer", destination: "gumroad_checkout" });
-  }, []);
-
-  const handleBuyProClick = useCallback(() => {
-    trackEvent("click_pro", { source: "pricing_table" });
-    if (typeof window !== "undefined") {
-      window.open(GUMROAD_URL, "_blank");
-    }
+    trackEvent("click_gumroad", { source: "landing", destination: "gumroad_checkout" });
   }, []);
 
   return (
@@ -289,11 +282,6 @@ export default function HomePage() {
                 <span className="pro-value">{row.pro}</span>
               </div>
             ))}
-          </div>
-          <div style={{ marginTop: 14 }}>
-            <button type="button" className="btn-primary" onClick={handleBuyProClick}>
-              <span>Buy Pro ($4.99)</span>
-            </button>
           </div>
         </section>
 

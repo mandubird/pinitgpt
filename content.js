@@ -72,6 +72,7 @@ function openGumroadFromExtension(source) {
   } catch (e) {}
 }
 
+
 // 블록 단위 Pin: 렌더 블록(p, li, h1~h4, pre, blockquote) 기준
 const BLOCK_TAG_SELECTOR = "p, li, h1, h2, h3, h4, pre, blockquote";
 const BLOCK_TEXT_HEAD_LEN = 30;
@@ -744,7 +745,7 @@ function createSidebar() {
     var secondaryBtn = modal.querySelector("#pinitgpt-upgrade-secondary");
     if (primaryBtn) {
       primaryBtn.addEventListener("click", function() {
-        openGumroadFromExtension("limit_modal");
+        openGumroadFromExtension("limit_reached");
         if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
       });
     }
@@ -787,6 +788,15 @@ function createSidebar() {
     el.textContent = message || "";
     el.style.display = "block";
     setTimeout(function () { el.style.display = "none"; }, 2500);
+  }
+
+  // Spec alias: additive conversion layer
+  function showUpgradeModal(source) {
+    if (source === "limit_reached" || source === "limit_modal") {
+      showUpgradeLimitModal();
+      return;
+    }
+    showProUpgradeToast(t("pro_toast_message") + "<br>" + t("pro_toast_body"), t("upgrade_btn"), source || "feature_lock");
   }
 
   function showProUpgradeToast(message, buttonLabel, source) {
@@ -1036,7 +1046,7 @@ function showCategoryPopup(msgElement, text, blockInfo) {
           if (!isProUser()) {
             if (pinCount >= LIMITS.FREE.PINS_PER_PROJECT) {
               if (shouldShowUpgradePrompt()) {
-                showUpgradeLimitModal();
+                showUpgradeModal("limit_reached");
               }
               pinLimitToast.innerHTML = t("pin_limit_toast").replace("%s", String(LIMITS.FREE.PINS_PER_PROJECT)) + "<br><a href=\"" + GUMROAD_URL + "\" target=\"_blank\" rel=\"noopener\" style=\"color:#00e5ff; text-decoration:underline; font-weight:bold; margin-top:6px; display:inline-block;\">" + t("pin_limit_continue") + "</a>";
               return;

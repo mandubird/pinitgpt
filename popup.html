@@ -40,8 +40,21 @@
     <button id="btn-activate" class="btn-activate" data-i18n="popup_btn_activate">활성화</button>
   </div>
   <div id="popup-msg" class="msg"></div>
+  <div style="display:flex; gap:8px; margin-top:8px;">
+    <button id="search-lock" style="background:#1a1a2e; color:#aaa; border:1px solid #333; border-radius:6px; padding:7px 8px; font-size:11px; cursor:pointer;">Search 🔒</button>
+    <button id="tags-lock" style="background:#1a1a2e; color:#aaa; border:1px solid #333; border-radius:6px; padding:7px 8px; font-size:11px; cursor:pointer;">Tags 🔒</button>
+    <button id="export-lock" style="background:#1a1a2e; color:#aaa; border:1px solid #333; border-radius:6px; padding:7px 8px; font-size:11px; cursor:pointer;">Export 🔒</button>
+  </div>
   <p class="early" data-i18n="popup_footer">지금 사면 평생 Pro. 나중엔 구독 모델로 전환됩니다.</p>
   <a id="popup-buy-link" href="https://remoney.gumroad.com/l/pinitgpt" target="_blank" rel="noopener" style="display:block; margin-top:10px; padding:10px; text-align:center; background:#1a1a2e; border:1px solid #333; border-radius:8px; color:#00e5ff; text-decoration:none; font-size:12px; font-weight:bold;" data-i18n="popup_buy_link">🔓 Early Supporter 구매 ($4.99)</a>
+  <div id="upgrade-banner" style="display:none; position:sticky; bottom:0; background:linear-gradient(135deg,#1a1a2e,#16213e); border-top:1px solid #333; padding:10px 14px; text-align:center; margin-top:10px;">
+    <div style="font-size:12px; color:#aaa; margin-bottom:6px;">
+      핀 무제한 · 검색 · 태그 잠금 해제
+    </div>
+    <button id="banner-upgrade-btn" style="background:#10b981; color:#fff; border:none; border-radius:6px; padding:7px 16px; font-size:13px; font-weight:600; cursor:pointer; width:100%;">
+      Pro 업그레이드 · $4.99 평생
+    </button>
+  </div>
   <script src="popup.js"></script>
 </body>
 </html>
