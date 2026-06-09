@@ -1051,7 +1051,7 @@ function showCategoryPopup(msgElement, text, blockInfo) {
               pinLimitToast.innerHTML = t("pin_limit_toast").replace("%s", String(LIMITS.FREE.PINS_PER_PROJECT)) + "<br><a href=\"" + GUMROAD_URL + "\" target=\"_blank\" rel=\"noopener\" style=\"color:#00e5ff; text-decoration:underline; font-weight:bold; margin-top:6px; display:inline-block;\">" + t("pin_limit_continue") + "</a>";
               return;
             }
-            if (projectChatIds.length >= LIMITS.FREE.PROJECTS && !projectChatIds.includes(CHAT_ID)) { pinLimitToast.innerHTML = t("free_notice_one_chat"); return; }
+            if (projectChatIds.length >= LIMITS.FREE.PROJECTS && !projectChatIds.includes(CHAT_ID)) { if (overlay.parentNode) overlay.parentNode.removeChild(overlay); showUpgradeModal("limit_reached"); return; }
           }
 
           let raw = input.value.trim();
