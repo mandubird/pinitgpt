@@ -245,7 +245,7 @@ export default function HomePage() {
           <div className="social-proof-grid">
             <div className="social-proof-item">
               <div style={{ fontSize: 11, color: "#9ca3af", marginBottom: 4 }}>Early usage</div>
-              <div>93 early users</div>
+              <div>200+ early users</div>
               <div style={{ fontSize: 11, color: "#9ca3af", marginTop: 4 }}>
                 Tracking how people actually use it before going bigger.
               </div>
